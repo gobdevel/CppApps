@@ -1,6 +1,3 @@
-#include <filesystem>
-#include <iostream>
-
 #include "appConfig.h"
 #include "gtest/gtest.h"
 
@@ -15,12 +12,10 @@ TEST(Config, simple) {
 
     auto app4(std::move(app1));
     EXPECT_NE(app4, app1);
-    std::cout << "Current Dir : " << std::filesystem::current_path() << "\n";
-}
-
-TEST(Config, Parse) {
+#if 0
     auto apps = ProcessMonitor::AppConfigParser::parse("testConfig.txt");
-    EXPECT_EQ(apps.size(), 3);
-
-    EXPECT_EQ(apps[0].getApp(), "/bin/process1");
+    for (const auto& app : apps) {
+        std::cout << app << "\n";
+    }
+#endif
 }
