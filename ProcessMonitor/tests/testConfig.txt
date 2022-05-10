@@ -1,0 +1,3 @@
+/bin/process1;-I 400;1
+/usr/bin/process2;-I 200;0
+/usr/sbin/process3;-n 300;1
