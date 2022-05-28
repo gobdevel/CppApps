@@ -8,13 +8,16 @@
 
 namespace ProcessMonitor {
 
+using Arg  = std::string;
+using Args = std::vector<Arg>;
+
 class AppConfig {
 public:
-    AppConfig(std::string app, std::string args, bool restart)
+    AppConfig(std::string app, Args args, bool restart)
         : m_app(std::move(app)), m_args(std::move(args)), m_restart(restart) {}
 
     std::string getApp() const noexcept { return m_app; }
-    std::string getArgs() const noexcept { return m_args; }
+    const Args& getArgs() const noexcept { return m_args; }
     bool        isRestartable() const noexcept { return m_restart; }
 
     friend bool operator==(const AppConfig& lhs, const AppConfig& rhs) {
@@ -29,13 +32,18 @@ public:
 
     friend std::ostream& operator<<(std::ostream&    stream,
                                     const AppConfig& obj) {
-        stream << obj.m_app << ", " << obj.m_args << ", " << obj.m_restart;
+        stream << obj.m_app;
+        for (auto& arg : obj.m_args) {
+            stream << ", " << arg;
+        }
+
+        stream << ", " << obj.m_restart;
         return stream;
     }
 
 private:
     std::string m_app;
-    std::string m_args;
+    Args        m_args;
     bool        m_restart;
 };
 
@@ -43,7 +51,9 @@ using AppConfigs = std::vector<AppConfig>;
 
 class AppConfigParser {
 public:
-    static AppConfigs parse(std::string filename);
+    static AppConfigs parse(const std::string filename);
+    static Args       parseArgs(const std::string& input);
+    static AppConfig  parseLine(const std::string& line);
 };
 
 }  // namespace ProcessMonitor

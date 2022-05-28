@@ -13,11 +13,17 @@ static int spawn(const AppConfig& cfg) {
             throw std::runtime_error("Fork failure !!!");
         } break;
         case 0: {
-            char* newArgv[] = {NULL};
-            char* newEnv[]  = {NULL};
+            auto& args = cfg.getArgs();
+            auto  size = args.size();
+            // Create array of char*
+            char** argv = (char**)malloc(sizeof(char*) * (size + 1));
+            argv[size]  = NULL;
+            for (int i = 0; i < size; ++i) {
+                argv[i] = const_cast<char*>(args[i].c_str());
+            }
 
             // Child process will keep on running forever
-            execv(cfg.getApp().c_str(), newArgv);
+            execv(cfg.getApp().c_str(), argv);
         } break;
         default:
             break;
