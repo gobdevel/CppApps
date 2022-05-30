@@ -36,10 +36,8 @@ TEST(AppConfig, AppConfig) {
     auto app4(std::move(app1));
     EXPECT_NE(app4, app1);
 
-#if 0
     auto apps = ProcessMonitor::AppConfigParser::parse("testConfig.txt");
     for (const auto& app : apps) {
         std::cout << app << "\n";
     }
-#endif
 }

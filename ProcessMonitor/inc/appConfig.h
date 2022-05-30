@@ -4,6 +4,7 @@
 #include <ostream>
 #include <string>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 namespace ProcessMonitor {
@@ -16,9 +17,9 @@ public:
     AppConfig(std::string app, Args args, bool restart)
         : m_app(std::move(app)), m_args(std::move(args)), m_restart(restart) {}
 
-    std::string getApp() const noexcept { return m_app; }
-    const Args& getArgs() const noexcept { return m_args; }
-    bool        isRestartable() const noexcept { return m_restart; }
+    const std::string& getApp() const noexcept { return m_app; }
+    const Args&        getArgs() const noexcept { return m_args; }
+    bool               isRestartable() const noexcept { return m_restart; }
 
     friend bool operator==(const AppConfig& lhs, const AppConfig& rhs) {
         return std::tie(lhs.m_app, lhs.m_args, lhs.m_restart) ==

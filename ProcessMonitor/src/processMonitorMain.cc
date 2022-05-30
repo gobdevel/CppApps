@@ -18,10 +18,17 @@ void ProcessMonitor::start() {
             auto app = cfg.getApp();
             auto pid = m_launcher.launch(cfg);
 
-            m_processInfos.emplace(
-                std::make_pair(pid, ProcessInfo(std::move(cfg), pid)));
+            //        m_processInfos.emplace(
+            //            std::make_pair(pid, ProcessInfo(std::move(cfg),
+            //            pid)));
+            if (pid != 0) {
+                m_processInfos.emplace(
+                    std::piecewise_construct, std::forward_as_tuple(pid),
+                    std::forward_as_tuple(std::move(cfg), pid));
 
-            std::cout << "Launched App : " << app << ", pid : " << pid << "\n";
+                std::cout << "Launched App : " << app << ", pid : " << pid
+                          << "\n";
+            }
         }
     }
     m_watcher.watch(
@@ -32,14 +39,16 @@ void ProcessMonitor::restart(int pid) {
     auto it = m_processInfos.find(pid);
     if (it == m_processInfos.end()) {
         // TODO ERROR
+        std::cout << "Restart : Unable to find pid : " << pid << "\n";
+        return;
     }
-    std::cout << "Re Launching App : " << it->second.getConfig().getApp()
-              << "\n";
     auto cfg = std::move(it->second.getConfig());
+    std::cout << "Re Launching App : " << cfg.getApp() << "\n";
 
     m_processInfos.erase(it);
     auto newPid = m_launcher.launch(cfg);
-    m_processInfos.emplace(std::piecewise_construct, std::forward_as_tuple(pid),
+    m_processInfos.emplace(std::piecewise_construct,
+                           std::forward_as_tuple(newPid),
                            std::forward_as_tuple(std::move(cfg), newPid));
 }
 }  // namespace ProcessMonitor
