@@ -1,12 +1,11 @@
 #include <filesystem>
-#include <functional>
-#include <iostream>
-#include <tuple>
-#include <utility>
 
+#include "log.h"
 #include "processMonitor.h"
 
 const std::string g_configFilename{"testConfig.txt"};
+
+using namespace Utils;
 
 namespace ProcessMonitor {
 
@@ -18,16 +17,12 @@ void ProcessMonitor::start() {
             auto app = cfg.getApp();
             auto pid = m_launcher.launch(cfg);
 
-            //        m_processInfos.emplace(
-            //            std::make_pair(pid, ProcessInfo(std::move(cfg),
-            //            pid)));
             if (pid != 0) {
                 m_processInfos.emplace(
                     std::piecewise_construct, std::forward_as_tuple(pid),
                     std::forward_as_tuple(std::move(cfg), pid));
 
-                std::cout << "Launched App : " << app << ", pid : " << pid
-                          << "\n";
+                LOG(Log::Info, "Launched App : %s, pid %u ", app.c_str(), pid);
             }
         }
     }
@@ -38,17 +33,19 @@ void ProcessMonitor::start() {
 void ProcessMonitor::restart(int pid) {
     auto it = m_processInfos.find(pid);
     if (it == m_processInfos.end()) {
-        // TODO ERROR
-        std::cout << "Restart : Unable to find pid : " << pid << "\n";
+        LOG(Log::Err, "Restart : Unable to find pid %u ", pid);
         return;
     }
     auto cfg = std::move(it->second.getConfig());
-    std::cout << "Re Launching App : " << cfg.getApp() << "\n";
 
     m_processInfos.erase(it);
-    auto newPid = m_launcher.launch(cfg);
-    m_processInfos.emplace(std::piecewise_construct,
-                           std::forward_as_tuple(newPid),
-                           std::forward_as_tuple(std::move(cfg), newPid));
+    if (cfg.isRestartable()) {
+        LOG(Log::Info, "Re Launching App : %s, old pid %u ",
+            cfg.getApp().c_str(), pid);
+        auto newPid = m_launcher.launch(cfg);
+        m_processInfos.emplace(std::piecewise_construct,
+                               std::forward_as_tuple(newPid),
+                               std::forward_as_tuple(std::move(cfg), newPid));
+    }
 }
 }  // namespace ProcessMonitor

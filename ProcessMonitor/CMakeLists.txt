@@ -16,7 +16,7 @@ file(GLOB_RECURSE SOURCES src/*.cc)
 
 # Library
 add_library(${PLIB} STATIC ${SOURCES})
-target_include_directories(${PLIB} PUBLIC inc)
+target_include_directories(${PLIB} PUBLIC inc "${CMAKE_SOURCE_DIR}/lib/tools/inc")
 
 # Executible
 add_executable(${PROJECT_NAME} main.cc)

@@ -3,16 +3,15 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <cstddef>
-#include <functional>
 #include <future>
-#include <iostream>
-#include <stdexcept>
 #include <thread>
 
 #include "appConfig.h"
+#include "log.h"
 
 namespace ProcessMonitor {
+
+using namespace Utils;
 
 static char** getArgsPtr(const AppConfig& cfg) {
     char** argv = nullptr;
@@ -37,7 +36,8 @@ static void demonise(char* argv[]) {
     // Create a new sid for child process
     int sid = setsid();
     if (sid < 0) {
-        throw std::runtime_error("Set sid failure");
+        LOG(Log::Emerg, "Set sid failure");
+        assert(false);
     }
 
     // Change the current working directory
@@ -52,7 +52,7 @@ static void demonise(char* argv[]) {
 
     int ret = execv(argv[0], argv);
     if (ret < 0) {
-        std::cout << "Unable to execv : " << argv[0] << "\n";
+        LOG(Log::Emerg, "Unable to execv : %s ", argv[0]);
     }
     exit(ret);
 }
@@ -62,7 +62,8 @@ static int spawn(const AppConfig& cfg) {
 
     pid = fork();
     if (pid < 0) {
-        throw std::runtime_error("Fork failure !!!");
+        LOG(Log::Emerg, "Fork failure");
+        assert(false);
     } else if (pid == 0) {
         demonise(getArgsPtr(cfg));
     }

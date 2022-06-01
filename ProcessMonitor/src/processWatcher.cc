@@ -1,6 +1,8 @@
 #include "processWatcher.h"
 
-#include <iostream>
+#include "log.h"
+
+using namespace Utils;
 
 namespace ProcessMonitor {
 
@@ -10,13 +12,14 @@ void ProcessWatcher::watch(ProcessStatusCb f) {
     while ((pid = wait(&status)) > 0) {
         if (WIFEXITED(status)) {
             // Child process exited
-            std::cout << "Pid : " << pid << " exited !!!\n";
+            LOG(Log::Debug, "Pid : %u exited, signal %u ", pid,
+                WTERMSIG(status));
             f(pid);
         }
         if (WIFSIGNALED(status)) {
             // Child process signaled sigkill
-            std::cout << "Pid : " << pid << " signaled : " << WTERMSIG(status)
-                      << "\n";
+            LOG(Log::Debug, "Pid : %u signaled, signal %u ", pid,
+                WTERMSIG(status));
             f(pid);
         }
     }

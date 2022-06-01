@@ -2,9 +2,6 @@
 #define __APP_CONFIG_H__
 
 #include <ostream>
-#include <string>
-#include <tuple>
-#include <utility>
 #include <vector>
 
 namespace ProcessMonitor {
